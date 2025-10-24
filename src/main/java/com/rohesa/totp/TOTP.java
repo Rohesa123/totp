@@ -2,8 +2,10 @@ package com.rohesa.totp;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 
@@ -95,7 +97,13 @@ public class TOTP {
         for (int i = -windowSize; i <= windowSize; i++) {
             try {
                 String calculatedCode = generateCodeFromCounter(currentTimeCounter + i);
-                if (calculatedCode.equals(code)) {
+
+                boolean areEqual = MessageDigest.isEqual(
+                        calculatedCode.getBytes(StandardCharsets.UTF_8),
+                        code.getBytes(StandardCharsets.UTF_8)
+                );
+
+                if (areEqual) {
                     return true;
                 }
             } catch (GeneralSecurityException e) {
